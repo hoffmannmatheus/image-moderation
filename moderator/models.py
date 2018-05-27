@@ -40,6 +40,10 @@ class ModeratedImage(models.Model):
   moderator = models.ForeignKey(Moderator, on_delete=models.PROTECT)
   timestamp = models.DateTimeField(auto_now_add=True)
   decision = models.IntegerField(choices=IMAGE_MODERATION_STATES, default=REJECTED)
+  
+  @property
+  def url(self):
+    return self.image.url
 
 
 class ModerationLog(models.Model):
