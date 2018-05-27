@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view
 
 from .models import Image, ModeratedImage
-from .exceptions import InvalidQueryParameters
-from .utils import extract_int_param
+from .serializers import ImageListSerializer
 
 @api_view(['GET'])
 def list_images(request, filter):
@@ -23,6 +23,17 @@ def list_images(request, filter):
     """
     if filter not in ['all', 'pending', 'approved', 'rejected', 'moderated']:
         return Response("Invalid filter value provided.", status=status.HTTP_400_BAD_REQUEST)
+
+    if filter == 'pending':
+        images = Image.objects.filter(moderatedimage=None).order_by('-timestamp')
+    elif filter == 'moderated':
+        images = Image.objects.filter(moderatedimage__isnull=False).order_by('-timestamp')
+    elif filter == 'approved' or filter == 'rejected':
+        filter_value = 1 if filter == 'approved' else 2
+        images = Image.objects.filter(moderatedimage__decision__exact=filter_value).order_by('-timestamp')
+    else:
+        images = Image.objects.all().order_by('-timestamp')
+
     paginator = PageNumberPagination()
     page_size = 25
     try:
@@ -32,8 +43,10 @@ def list_images(request, filter):
     except ValueError:
         return Response("Invalid 'size' value provided.", status=status.HTTP_400_BAD_REQUEST)
     paginator.page_size = page_size
-    
-    return Response('filter by %s' % filter)
+
+    images_page = paginator.paginate_queryset(images, request)
+    serializer = ImageListSerializer(images_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
 
 def image_by_id(request, image_id):
     """
