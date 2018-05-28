@@ -3,8 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Image, Moderator, ModeratedImage, APPROVED, REJECTED
+from .models import Image, Moderator, ModeratedImage, ModerationLog, APPROVED, REJECTED
 from .serializers import ImageListSerializer
+
 
 class ImageView(APIView):
 
@@ -50,5 +51,6 @@ class ImageView(APIView):
           return Response("'decision' not found or invalid.", status=status.HTTP_400_BAD_REQUEST)
       decision = APPROVED if decision == 'approved' else REJECTED
 
+      ModerationLog.objects.create(moderator=moderator, image=image, decision=decision)
       ModeratedImage.objects.update_or_create(image=image, defaults={'decision': decision, 'moderator': moderator})
       return Response(ImageListSerializer(Image.objects.get(pk=image_id)).data)

@@ -6,8 +6,9 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view
 
-from .models import Image, ModeratedImage
+from .models import Image, ModeratedImage, Moderator
 from .serializers import ImageListSerializer
+
 
 @api_view(['GET'])
 def list_images(request, filter):
@@ -48,6 +49,20 @@ def list_images(request, filter):
     serializer = ImageListSerializer(images_page, many=True)
     return paginator.get_paginated_response(serializer.data)
 
+
 @api_view(['GET'])
 def next_pending(request):
-    pass
+    image = Image.objects.filter(moderatedimage=None).order_by('timestamp').first()
+    return Response(ImageListSerializer(image).data)
+
+
+@api_view(['GET'])
+def moderator_recents(request, name):
+    moderator = None 
+    try:
+        moderator = Moderator.objects.get(name=name)
+    except Moderator.DoesNotExist:
+        return Response("moderator not found.", status=status.HTTP_400_BAD_REQUEST)
+    images = Image.objects.filter(moderatedimage__moderator=moderator).order_by('-timestamp')[:5]
+    serializer = ImageListSerializer(images, many=True)
+    return Response(serializer.data)
