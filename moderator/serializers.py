@@ -10,4 +10,4 @@ class ImageListSerializer(serializers.ModelSerializer):
   id = serializers.IntegerField()
   url = serializers.CharField()
   timestamp = serializers.DateTimeField()
-  decision = serializers.IntegerField(source='moderatedimage.decision')
+  decision = serializers.CharField(source='moderatedimage.string_decision')

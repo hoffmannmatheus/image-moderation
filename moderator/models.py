@@ -42,6 +42,10 @@ class ModeratedImage(models.Model):
   decision = models.IntegerField(choices=IMAGE_MODERATION_STATES, default=REJECTED)
   
   @property
+  def string_decision(self):
+    return 'approved' if self.decision == APPROVED else 'rejected'
+    
+  @property
   def url(self):
     return self.image.url
 

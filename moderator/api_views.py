@@ -48,14 +48,6 @@ def list_images(request, filter):
     serializer = ImageListSerializer(images_page, many=True)
     return paginator.get_paginated_response(serializer.data)
 
-def image_by_id(request, image_id):
-    """
-    GET and PUT on a specified image.
-    Request: 
-        GET requires nothing special.
-        POST requires {'decision': 'accepted | rejected'}
-    Response:
-        Image object on success
-        400 on non existant
-    """
-    return HttpResponse("%s IMAGES %s" % (request.method, image_id))
+@api_view(['GET'])
+def next_pending(request):
+    pass
