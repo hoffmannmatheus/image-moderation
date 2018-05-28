@@ -25,7 +25,7 @@ class Moderator(models.Model):
   """
   Represents a moderator, resopnsible for moderating images.
   """
-  name = models.TextField(null=False, blank=False)
+  name = models.TextField(null=False, blank=False, unique=True)
 
   def __str__(self):
     return self.name
