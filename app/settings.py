@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 PROJECT_APPS = [
     'moderator.apps.ModeratorConfig',
+    'ui.apps.UiConfig',
 ]
 
 INSTALLED_APPS = [
