@@ -13,7 +13,7 @@ Note: This only serves the purposes of development playground, learning and show
 
 ### Install Dependencies
 ```bash
-sudo apt-get install python3 python3-dev virtualenv
+sudo apt-get install python3 python3-dev virtualenv npm
 ```
 Nice [reference here](https://help.dreamhost.com/hc/en-us/articles/215317948-How-to-install-Django-using-virtualenv).
 
@@ -26,10 +26,12 @@ source /path/to/your/env/bin/activate
 ### Update project requirements
 ```bash
 pip install -r requirements.txt
+npm install
 ```
 
 ### Run server
 ```bash
+npm run webpack
 ./manage.py migrate
 ./manage.py runserver
 ```

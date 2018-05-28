@@ -12,7 +12,6 @@
         {% endblock %}
     </head>
     <body>
-        {{ users }}
         <div id="app-container">
             <!-- react -->
         </div>
@@ -21,8 +20,7 @@
             window.props = {{ props | safe }};
         </script>
 
-        <script src="{% static "js/lib/nav.js" %}" type="text/javascript"></script>
-        <script src="{% get_static_prefix %}bundles/ui.js?version={{ version }}" type="text/javascript"></script>
+        <script src="{% get_static_prefix %}bundles/ui.js" type="text/javascript"></script>
         
     </body>
 </html>
