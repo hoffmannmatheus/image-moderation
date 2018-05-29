@@ -21,6 +21,7 @@ export default class Moderator extends React.Component {
     
     componentWillMount() {
         this.state = {
+            moderator: this.props.moderator,
             nextImage: null,
             lastImages: [],
             error: null,
@@ -29,6 +30,16 @@ export default class Moderator extends React.Component {
     }
 
     componentDidMount() {
+        this.loadData();
+    }
+    
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.moderator !== this.state.moderator) {
+            this.setState({ moderator: nextProps.moderator }, () => this.loadData());
+        }
+    }
+
+    loadData() {
         this.loadNextPending();
         this.loadLastImages();
     }
@@ -68,12 +79,11 @@ export default class Moderator extends React.Component {
         let that = this;
         let body = {
             decision: isApproved ? 'approved' : 'rejected',
-            moderator: this.props.moderator
+            moderator: this.state.moderator
         };
         api.put(`/images/${image.id}/`, body)
             .then(function (response) {
-                that.loadNextPending();
-                that.loadLastImages();
+                that.loadData();
             });
     }
 
