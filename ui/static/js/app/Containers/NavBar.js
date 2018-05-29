@@ -42,7 +42,7 @@ export default class NavBar extends React.Component {
                       <Button style={{marginLeft: '15px'}} raised onClick={() => this.navigateTo('')} theme="secondary-bg on-secondary">
                         Dashboard
                       </Button>
-                      <Button style={{marginLeft: '15px'}} raised onClick={() => this.navigateTo('moderation')} theme="secondary-bg on-secondary">
+                      <Button style={{marginLeft: '15px'}} raised onClick={() => this.navigateTo('moderate')} theme="secondary-bg on-secondary">
                         Moderation
                       </Button>
                   </TopAppBarSection>

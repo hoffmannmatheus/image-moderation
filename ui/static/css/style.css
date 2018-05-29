@@ -22,6 +22,21 @@ html, body {
     box-sizing: border-box;
 }
 
-.load-more-button {
-    
+.next-image-container {
+    display: flex;
+    flex-direction: row;
+    flex-direction: column;
+    align-items: center;
+    padding: 35px;
+}
+
+.next-image {
+    width: 350px;
+}
+.buttons-container {
+    display: flex;
+    flex-direction: row;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 35px;
 }
