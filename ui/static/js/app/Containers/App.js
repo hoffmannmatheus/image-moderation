@@ -36,7 +36,7 @@ class Body extends React.Component {
                 <BrowserRouter>
                     <Switch>
                         <Route exact path={'/ui/'} render={() => (
-                            <ModeratedImages moderator={this.props.moderator} />
+                            <ModeratedImages />
                         )} />
                         <Route exact path={'/ui/moderate/'} render={() => (
                             <Moderator moderator={this.props.moderator} />

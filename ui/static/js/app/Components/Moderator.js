@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { LinearProgress } from 'rmwc/LinearProgress';
-import { Grid, GridCell } from 'rmwc/Grid';
 import { Button, ButtonIcon } from 'rmwc/Button';
+import { Icon } from 'rmwc/Icon';
 import { 
     ImageList,
     ImageListItem,
@@ -63,7 +63,7 @@ export default class Moderator extends React.Component {
 
     loadLastImages() {
         let that = this;
-        api.get(`/moderator/${this.props.moderator}/recent/`)
+        api.get(`/moderator/${this.state.moderator}/recent/`)
             .then(function (response) {
                 let error = response.status != 200;
                 let lastImages = !error && response.data;
@@ -121,7 +121,7 @@ class NextImage extends React.Component {
                         Approve
                     </Button>
                     <Button raised
-                        style={{'margin-left': '35px'}}
+                        style={{'marginLeft': '35px'}}
                         onClick={() => this.props.onDecision(false)}>
                         <ButtonIcon use="highlight_off" />
                         Reject
@@ -153,7 +153,14 @@ class LastImagesList extends React.Component {
                             <ImageListImage src={image.url} />
                             <ImageListSupporting>
                                 <ImageListLabel>{image.decision}</ImageListLabel>
-                                
+                                {image.decision == 'rejected' &&
+                                    <Icon
+                                        onClick={() => this.props.onDecision(image, true)}
+                                        strategy="ligature">check_circle</Icon>}
+                                {image.decision == 'approved' &&
+                                    <Icon
+                                        onClick={() => this.props.onDecision(image, false)}
+                                        strategy="ligature">highlight_off</Icon>}
                             </ImageListSupporting>
                         </ImageListItem>
                     ))}
