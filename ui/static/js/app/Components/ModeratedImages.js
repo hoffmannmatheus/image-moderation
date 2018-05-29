@@ -10,6 +10,7 @@ import {
 import { LinearProgress } from 'rmwc/LinearProgress';
 import { Select } from 'rmwc/Select';
 import { Grid, GridCell } from 'rmwc/Grid';
+import { Button } from 'rmwc/Button';
 
 import api from '../Utils/api';
 
@@ -33,18 +34,18 @@ export default class ModeratedImages extends React.Component {
         this.loadImages();
     }
 
-    loadImages() {
+    loadImages(contactImages) {
         this.setState({isLoading: true, totalCount: 0, error: null});
         let that = this;
-        api.get(`/images/${this.state.filter}/?page=${this.state.page}`)
+        api.get(`/images/${this.state.filter}/?page=${this.state.page}&size=15`)
             .then(function (response) {
                 let error = response.status != 200;
                 let images = !error && response.data.results;
                 let hasNext = !error && !!response.data.next;
-                let page = hasNext ? that.state.page+1 : that.state.page;
                 let totalCount = !error && response.data.count || 0;
+                if (contactImages) images = that.state.images.concat(images);
                 that.setState(
-                    {images, totalCount, error: error && response, isLoading: false, hasNext, page}
+                    {images, totalCount, error: error && response, isLoading: false, hasNext}
                 );
             })
             .catch(function (error) {
@@ -56,7 +57,15 @@ export default class ModeratedImages extends React.Component {
     updateFilter(newFilter) {
         this.setState(
             { filter: newFilter, page: 1 },
-            () => this.loadImages() // only reload when setState done
+            () => this.loadImages()
+        );
+    }
+
+    nextPage() {
+        if (!this.state.hasNext) return;
+        this.setState(
+            { page: this.state.page + 1 },
+            () => this.loadImages(true)
         );
     }
 
@@ -78,7 +87,9 @@ export default class ModeratedImages extends React.Component {
                     filter={this.state.filter}
                     onChangeFilter={(filter) => this.updateFilter(filter)} />
                 <ImagesGrid
-                    images={images} />
+                    images={images}
+                    hasNextPage={this.state.hasNext}
+                    onNextPage={() => this.nextPage()} />
             </div>
         );
     }
@@ -109,25 +120,35 @@ class ImagesGrid extends React.Component {
     render() {
         let images = this.props.images;
         return (
-            <ImageList
-                masonry
-                withTextProtection
-                style={{
-                    columnCount: 5,
-                    columnGap: '16px',
-                    maxWidth: '1000px'
-                }}
-                >
-                {
-                images.map(image => (
-                    <ImageListItem key={image.url} style={{ marginBottom: '16px' }}>
-                        <ImageListImage src={image.url} />
-                        <ImageListSupporting>
-                            <ImageListLabel>{image.timestamp}</ImageListLabel>
-                        </ImageListSupporting>
-                    </ImageListItem>
-                ))}
-            </ImageList>
+            <div>
+                <ImageList
+                    masonry
+                    withTextProtection
+                    style={{
+                        columnCount: 5,
+                        columnGap: '16px',
+                        maxWidth: '1000px'
+                    }}
+                    >
+                    {
+                    images.map(image => (
+                        <ImageListItem key={image.url} style={{ marginBottom: '16px' }}>
+                            <ImageListImage src={image.url} />
+                            <ImageListSupporting>
+                                <ImageListLabel>{image.timestamp}</ImageListLabel>
+                            </ImageListSupporting>
+                        </ImageListItem>
+                    ))}
+                </ImageList>
+                {this.props.hasNextPage && 
+                    <Button
+                        className="load-more-button"
+                        outlined
+                        onClick={this.props.onNextPage}>
+                        Load More
+                    </Button>
+                }
+            </div>
         );
     }
 };
