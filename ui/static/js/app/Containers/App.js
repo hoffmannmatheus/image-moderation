@@ -9,31 +9,63 @@ import {
 import { Select } from 'rmwc/Select';
 
 
-import ImageList from '../Components/ImageList';
+import ModeratedImages from '../Components/ModeratedImages';
 import Moderator from '../Components/Moderator';
 
 export default class App extends React.Component {
 
     componentWillMount() {
-        let moderators = this.getModerators();
+        let moderators = this.props.config && this.props.config.moderators || [];
         this.state = {
             moderator: moderators.length > 0 ? moderators[0] : null
         }
     }
 
-    getModerators() {
-        return this.props.config && this.props.config.moderators || [];
+    render() {
+        let moderators = this.props.config && this.props.config.moderators;
+        return (
+            <div className="app">
+                <Body
+                    moderator={this.state.moderator} />
+                <NavBar
+                    moderator={this.state.moderator}
+                    moderators={moderators}
+                    onSetModerator={(m) => this.setState({moderator: m})}/>
+            </div>
+        )
     }
+}
+
+class Body extends React.Component {
+    render() {
+        return (
+            <main className="main-content">
+                <BrowserRouter>
+                    <Switch>
+                        <Route exact path={'/ui/'} render={() => (
+                            <ModeratedImages moderator={this.props.moderator} />
+                        )} />
+                        <Route exact path={'/ui/moderate/'} render={() => (
+                            <Moderator moderator={this.props.moderator} />
+                        )} />
+                    </Switch>
+                </BrowserRouter>
+            </main>
+        );
+    }
+};
+
+class NavBar extends React.Component {
 
     renderModeratorChoice() {
-        let moderators = this.getModerators();
+        let moderators = this.props.moderators || [];
         if (moderators.length == 0) {
             return (<span>No moderators</span>);
         } else {
             return (
                 <Select box
-                    value={this.state.moderator}
-                    onChange={evt => this.setState({moderator: evt.target.value})}
+                    value={this.props.moderator}
+                    onChange={evt => this.props.onSetModerator(evt.target.value)}
                     label="Moderator"
                     placeholder=""
                     options={moderators.map((i) => {return {label: i, value: i}; } )}
@@ -44,28 +76,16 @@ export default class App extends React.Component {
 
     render() {
         return (
-            <div>
-                <TopAppBar>
-                    <TopAppBarRow>
-                        <TopAppBarSection alignStart>
-                            <TopAppBarTitle>Image Moderator</TopAppBarTitle>
-                        </TopAppBarSection>
-                        <TopAppBarSection alignEnd>
-                            {this.renderModeratorChoice()}
-                        </TopAppBarSection>
-                    </TopAppBarRow>
-                </TopAppBar>
-                <BrowserRouter>
-                    <Switch>
-                        <Route exact path={'/ui/'} render={() => (
-                            <ImageList moderator={this.state.moderator} />
-                        )} />
-                        <Route exact path={'/ui/moderate/'} render={() => (
-                            <Moderator moderator={this.state.moderator} />
-                        )} />
-                    </Switch>
-                </BrowserRouter>
-            </div>
-        )
+            <TopAppBar>
+                <TopAppBarRow>
+                    <TopAppBarSection alignStart>
+                        <TopAppBarTitle>Image Moderator</TopAppBarTitle>
+                    </TopAppBarSection>
+                    <TopAppBarSection alignEnd>
+                        {this.renderModeratorChoice()}
+                    </TopAppBarSection>
+                </TopAppBarRow>
+            </TopAppBar>
+        );
     }
-}
+};

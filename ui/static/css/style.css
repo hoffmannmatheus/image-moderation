@@ -7,3 +7,17 @@ html, body {
     padding: 0;
 }
 
+.app {
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+}
+
+.main-content {
+    margin-top: 64px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    box-sizing: border-box;
+}
