@@ -8,6 +8,8 @@ import {
     ImageListLabel
   } from 'rmwc/ImageList';
 import { LinearProgress } from 'rmwc/LinearProgress';
+import { Select } from 'rmwc/Select';
+import { Grid, GridCell } from 'rmwc/Grid';
 
 import api from '../Utils/api';
 
@@ -28,11 +30,11 @@ export default class ModeratedImages extends React.Component {
     }
 
     componentDidMount() {
-        this.loadChannels();
+        this.loadImages();
     }
 
-    loadChannels() {
-        this.setState({isLoading: true});
+    loadImages() {
+        this.setState({isLoading: true, totalCount: 0, error: null});
         let that = this;
         api.get(`/images/${this.state.filter}/?page=${this.state.page}`)
             .then(function (response) {
@@ -40,8 +42,7 @@ export default class ModeratedImages extends React.Component {
                 let images = !error && response.data.results;
                 let hasNext = !error && !!response.data.next;
                 let page = hasNext ? that.state.page+1 : that.state.page;
-                let totalCount = !error && response.count || 0;
-                console.log(response);
+                let totalCount = !error && response.data.count || 0;
                 that.setState(
                     {images, totalCount, error: error && response, isLoading: false, hasNext, page}
                 );
@@ -50,6 +51,13 @@ export default class ModeratedImages extends React.Component {
                 console.log(error);
                 that.setState({images:[], totalCount: 0, error: "Unable to load images", isLoading: false});
             });
+    }
+
+    updateFilter(newFilter) {
+        this.setState(
+            { filter: newFilter, page: 1 },
+            () => this.loadImages() // only reload when setState done
+        );
     }
 
     render() {
@@ -64,6 +72,43 @@ export default class ModeratedImages extends React.Component {
         }
 
         return  (
+            <div>
+                <GridHeader
+                    totalCount={this.state.totalCount} 
+                    filter={this.state.filter}
+                    onChangeFilter={(filter) => this.updateFilter(filter)} />
+                <ImagesGrid
+                    images={images} />
+            </div>
+        );
+    }
+}
+
+class GridHeader extends React.Component {
+    render() {
+        return (
+            <Grid>
+                <GridCell span="6">
+                    Showing {this.props.totalCount} images
+                </GridCell>
+                <GridCell span="6">
+                    <Select box
+                        value={this.props.filter}
+                        onChange={evt => this.props.onChangeFilter(evt.target.value)}
+                        label="Filter"
+                        placeholder=""
+                        options={FILTER_OPTIONS.map((i) => {return {label: i, value: i}; } )}
+                    />
+                </GridCell>
+            </Grid>
+        );
+    }
+}
+
+class ImagesGrid extends React.Component {
+    render() {
+        let images = this.props.images;
+        return (
             <ImageList
                 masonry
                 withTextProtection
@@ -85,4 +130,4 @@ export default class ModeratedImages extends React.Component {
             </ImageList>
         );
     }
-}
+};
