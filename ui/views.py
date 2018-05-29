@@ -9,5 +9,5 @@ def ui(request):
     """
     Serves react app for the image moderation UI.
     """
-    context = { 'users': [ 'dog', 'mat' ] }
+    context = { 'props': {'moderators': [ 'dog', 'mat' ] } }
     return render(request, 'ui/base.html', context=context)
